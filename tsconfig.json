@@ -1,39 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "outDir": "lib",
-    "declaration": true,
-    "sourceMap": true,
-    "declarationMap": true,
-    "moduleDetection": "force",
-
-    "lib": ["ES2020", "ESNext.Array", "DOM"],
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
     "rootDir": "./src",
-
-    // ESM Features
-    "verbatimModuleSyntax": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-
-    // Type Safety
     "strict": true,
-    "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitThis": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-
-    // Interop
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-
-    // DX Boosters
-    "allowJs": false,
-    "checkJs": false,
+    "moduleResolution": "node"
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
+
