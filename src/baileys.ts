@@ -2,7 +2,7 @@ import {
   default as makeWASocket,
   useMultiFileAuthState,
   DisconnectReason,
-  proto,
+  AnyMessageContent,
 } from '@whiskeysockets/baileys';
 import QRCode from 'qrcode';
 import axios from 'axios';
@@ -82,7 +82,8 @@ export class SessionManager {
 
         if (connection === 'close') {
           const shouldReconnect =
-            lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+            (lastDisconnect?.error as any)?.output?.statusCode !==
+            DisconnectReason.loggedOut;
           sessionState.status = 'disconnected';
           logger.info({ sessionId, shouldReconnect }, 'Connection closed');
 
@@ -170,8 +171,9 @@ export class SessionManager {
 
     try {
       const msg = await session.socket.sendMessage(to, { text });
-      logger.info({ sessionId, to, msgId: msg.key.id }, 'Message sent');
-      return msg.key.id;
+      const messageId = msg?.key?.id || undefined;
+      logger.info({ sessionId, to, msgId: messageId }, 'Message sent');
+      return messageId;
     } catch (error) {
       logger.error(error, 'Failed to send message');
       throw error;
@@ -191,26 +193,25 @@ export class SessionManager {
     }
 
     try {
-      const mediaType = (type || 'image') as
-        | 'image'
-        | 'video'
-        | 'document'
-        | 'audio';
+      const mediaType = (type || 'image') as string;
       const response = await axios.get(mediaUrl, {
         responseType: 'arraybuffer',
         timeout: 30000,
       });
 
-      const msg = await session.socket.sendMessage(to, {
+      const messageContent: AnyMessageContent = {
         [mediaType]: response.data,
         caption,
-      });
+      } as AnyMessageContent;
+
+      const msg = await session.socket.sendMessage(to, messageContent);
+      const messageId = msg?.key?.id || undefined;
 
       logger.info(
-        { sessionId, to, msgId: msg.key.id, type: mediaType },
+        { sessionId, to, msgId: messageId, type: mediaType },
         'Media sent'
       );
-      return msg.key.id;
+      return messageId;
     } catch (error) {
       logger.error(error, 'Failed to send media');
       throw error;
