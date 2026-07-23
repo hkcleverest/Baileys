@@ -8,8 +8,8 @@ RUN corepack enable && corepack prepare yarn@4.x --activate
 # Copy package files
 COPY package*.json yarn.lock ./
 
-# Clear any stale cache and install dependencies with yarn
-RUN rm -rf .yarn/cache && yarn install --immutable
+# Clear stale cache and reinstall with fresh lockfile
+RUN rm -rf .yarn/cache .yarn/install-state.gz && yarn install --refresh-lockfile
 
 # Copy source code
 COPY src ./src
