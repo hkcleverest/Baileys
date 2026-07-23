@@ -2,22 +2,25 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Enable corepack for yarn
+RUN corepack enable && corepack prepare yarn@4.x --activate
 
-# Install dependencies
-RUN npm ci
+# Copy package files
+COPY package*.json yarn.lock ./
+
+# Install dependencies with yarn
+RUN yarn install --immutable
 
 # Copy source code
 COPY src ./src
 COPY tsconfig.json ./
 
 # Build TypeScript
-RUN npm run build
+RUN yarn build
 
 # Expose port (Railway will inject PORT env var)
 EXPOSE 8234
 
 # Start the server
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
 
